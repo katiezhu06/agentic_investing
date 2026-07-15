@@ -26,11 +26,25 @@ def get_stock_info(symbol):
     "profit_margins": info.get("profitMargins"),
 
     }
+def get_price_history(symbol):
+
+    stock = yf.Ticker(symbol)
+
+    history = stock.history(period="6mo")
+
+    return history
+
+
 
 
 if __name__ == "__main__":
+
     data = get_stock_info("AAPL")
 
     print(data)
+
+    history = get_price_history("AAPL")
+
+    print(history.head())
     
  
