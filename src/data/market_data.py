@@ -21,10 +21,16 @@ def get_stock_info(symbol):
 
     "52_week_high": info.get("fiftyTwoWeekHigh"),
     "52_week_low": info.get("fiftyTwoWeekLow"),
-}
+
+    "return_on_equity": info.get("returnOnEquity"),
+    "profit_margins": info.get("profitMargins"),
+
+    }
 
 
 if __name__ == "__main__":
     data = get_stock_info("AAPL")
 
     print(data)
+    
+ 
