@@ -9,22 +9,24 @@ watchlist = get_watchlist()
 
 for stock in watchlist:
 
+    print("--------------------------------")
+    print("Checking:", stock)
+
     stock_info = get_stock_info(stock)
 
     price_history = get_price_history(stock)
 
+    if price_history is None:
+        print("No price data")
+        continue
 
     fundamental_score = calculate_fundamental_score(stock_info)
 
     technical_score = calculate_technical_score(price_history)
 
 
-    print(stock)
-
     print("Fundamental:")
     print(fundamental_score)
 
     print("Technical:")
     print(technical_score)
-
-    print("--------------------------------")

@@ -32,6 +32,9 @@ def get_price_history(symbol):
 
     history = stock.history(period="6mo")
 
+    if history.empty:
+        return None
+
     return history
 
 
