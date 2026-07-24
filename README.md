@@ -1,61 +1,170 @@
-# Agentic Investing
+# AI Closing Bell Investment Agent
 
-Connect [Cursor](https://cursor.com) to Robinhood Agentic Trading via the Model Context Protocol (MCP), so your agent can read portfolio data and place trades in a dedicated Agentic account.
+## Project Goal
 
-## Prerequisites
+Build an AI-powered end-of-day trading agent that analyzes stocks near the market close (e.g., 3:45 PM ET), evaluates company fundamentals, technical indicators, news sentiment, and overall market conditions, then generates a trading score and recommends whether to **Buy**, **Hold**, or **Sell**.
 
-- A Robinhood individual investing account in good standing
-- Access to [Robinhood Agentic Trading](https://robinhood.com/us/en/support/articles/agentic-trading-overview/) (rolling out gradually)
-- [Cursor](https://cursor.com) with MCP support
-- A desktop browser for OAuth and Agentic account setup
+For existing positions, the agent also evaluates whether exit conditions have been met. If the user approves, the agent prepares a Robinhood order for review through the Robinhood MCP.
 
-## Setup
+Unlike a simple rule-based trading bot, this project focuses on AI reasoning, explainability, and decision support.
 
-This repo includes a project-level MCP config at [`.cursor/mcp.json`](.cursor/mcp.json):
+---
 
-```json
-{
-  "mcpServers": {
-    "robinhood-trading": {
-      "url": "https://agent.robinhood.com/mcp/trading"
-    }
-  }
-}
+# Current Progress
+
+## ✅ Completed
+
+### Data Module
+
+- Retrieve stock fundamental data using Yahoo Finance
+- Retrieve historical price data (6 months)
+- Support multiple stocks through a customizable watchlist
+
+### Fundamental Analysis
+
+Implemented a rule-based scoring system using:
+
+- Return on Equity (ROE)
+- Profit Margin
+- Price-to-Earnings (P/E) Ratio
+- Earnings Per Share (EPS)
+
+Current Score: **35 points**
+
+---
+
+### Technical Analysis
+
+Implemented:
+
+- ✅ 20-Day Moving Average (MA20)
+
+Planned:
+
+- RSI
+- Trading Volume
+- Price Momentum
+
+Current Score: **7 / 25 points implemented**
+
+---
+
+# Workflow
+
+```text
+Watchlist
+      │
+      ▼
+Retrieve Stock Data
+      │
+      ▼
+Retrieve Price History
+      │
+      ▼
+Fundamental Analysis
+      │
+      ▼
+Technical Analysis
+      │
+      ▼
+News Sentiment (Planned)
+      │
+      ▼
+Market Environment (Planned)
+      │
+      ▼
+Generate Trading Score
+      │
+      ▼
+LLM Investment Reasoning
+      │
+      ▼
+Buy / Hold / Sell Recommendation
+      │
+      ▼
+(Optional)
+Prepare Robinhood Order
 ```
 
-1. Clone this repo and open it in Cursor.
-2. Restart Cursor (or reload the window) so it loads the MCP server.
-3. Open **Cursor Settings** (`Cmd + Shift + J` on Mac, `Ctrl + Shift + J` on Windows/Linux).
-4. Go to **Tools & MCPs** and confirm `robinhood-trading` is listed.
-5. Complete Robinhood OAuth when prompted, then open and fund your Agentic account if you have not already.
+---
 
-### Alternative: global config
+# Project Structure
 
-To use Robinhood MCP in every project, add the same entry to `~/.cursor/mcp.json` instead.
+```text
+agentic_investing/
 
-## Usage
+src/
+│
+├── main.py
+│
+├── data/
+│   ├── market_data.py
+│   ├── watchlist.py
+│   ├── news_data.py
+│   └── portfolio_data.py
+│
+└── analysis/
+    ├── fundamental_analysis.py
+    └── technical_analysis.py
+```
 
-Use **Agent** mode in Cursor and ask in natural language, for example:
+---
 
-- "Show my Robinhood portfolio and buying power."
-- "Get a quote for AAPL."
-- "Review a market order for 1 share of MSFT before placing it."
+# Scoring System
 
-Cursor will request approval before each MCP tool call. Review every action carefully before approving.
+## Fundamental Analysis (35 pts)
 
-Trades are placed only in your **Robinhood Agentic account**, not your primary investing account.
+| Metric | Points |
+|--------|-------:|
+| ROE | 7 |
+| Profit Margin | 8 |
+| P/E Ratio | 10 |
+| EPS | 10 |
 
-## Troubleshooting
+---
 
-- **Server not appearing:** Restart Cursor and check **Output → MCP Logs** (`Cmd + Shift + U`).
-- **Auth issues:** Disconnect and reconnect the server in **Tools & MCPs**, or remove and re-add the entry in `mcp.json`.
-- **Onboarding:** Agentic account setup must be completed on desktop. If you started on mobile, open the onboarding URL in a desktop browser.
+## Technical Analysis (25 pts)
 
-## References
+| Metric | Points | Status |
+|--------|-------:|--------|
+| Moving Average | 7 | ✅ Completed |
+| RSI | 8 | 🚧 Planned |
+| Volume | 5 | 🚧 Planned |
+| Momentum | 5 | 🚧 Planned |
 
-- [Robinhood Agentic Trading overview](https://robinhood.com/us/en/support/articles/agentic-trading-overview/)
-- [Cursor MCP documentation](https://cursor.com/docs/mcp)
+---
 
-## Disclaimer
+## News Sentiment (20 pts)
 
-Agentic trading involves significant risk, including possible loss of your entire investment. You are responsible for trades your AI agent places. Robinhood does not supervise connected agents. Review Robinhood's disclosures before using this setup.
+Planned features:
+
+- News collection
+- LLM sentiment analysis
+- Business impact evaluation
+- Confidence score
+
+---
+
+## Market Environment (15 pts)
+
+Planned features:
+
+- S&P 500 daily performance
+- QQQ daily performance
+
+---
+
+# Technologies
+
+- Python
+- pandas
+- yfinance
+- Git
+- GitHub
+
+Future:
+
+- OpenAI API
+- Robinhood MCP
+- News API
+- LangGraph
