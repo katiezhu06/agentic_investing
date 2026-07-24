@@ -1,3 +1,40 @@
+def calculate_rsi(history):
+
+    close = history["Close"]
+
+    delta = close.diff()
+
+    gain = delta.clip(lower=0)
+
+    loss = -delta.clip(upper=0)
+
+
+    average_gain = gain.rolling(window=14).mean()
+
+    average_loss = loss.rolling(window=14).mean()
+
+
+    rs = average_gain / average_loss
+
+    rsi = 100 - (100 / (1 + rs))
+
+
+    return rsi
+def calculate_rsi_score(rsi):
+
+    if rsi < 30:
+        return 10
+
+    elif rsi < 50:
+        return 7
+
+    elif rsi < 70:
+        return 8
+
+    else:
+        return 4
+
+
 def calculate_technical_score(price_history):
 
     score = 0
@@ -27,6 +64,16 @@ def calculate_technical_score(price_history):
     details["Moving Average"] = ma_score
 
 
+    rsi = calculate_rsi(price_history)
+
+    latest_rsi = rsi.iloc[-1]
+
+    rsi_score = calculate_rsi_score(latest_rsi)
+
+    score += rsi_score
+
+    details["RSI"] = rsi_score
+
     return {
         "technical_score": score,
         "details": details
@@ -39,5 +86,5 @@ if __name__ == "__main__":
     print("Technical Analysis Module")
     print(calculate_technical_score(price_history))
 
-    
+
 
