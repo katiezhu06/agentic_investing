@@ -20,20 +20,44 @@ def calculate_rsi(history):
 
 
     return rsi
+
 def calculate_rsi_score(rsi):
 
     if rsi < 30:
-        return 10
-
-    elif rsi < 50:
-        return 7
-
-    elif rsi < 70:
         return 8
 
-    else:
-        return 4
+    elif rsi < 50:
+        return 6
 
+    elif rsi < 70:
+        return 7
+
+    else:
+        return 3
+
+def calculate_volume_ratio(history):
+
+    volume = history["Volume"]
+
+    average_volume = volume.rolling(window=20).mean().iloc[-1]
+
+    current_volume = volume.iloc[-1]
+
+    volume_ratio = current_volume / average_volume
+
+    return volume_ratio
+
+
+def calculate_volume_ratio_score(volume_ratio):
+
+    if volume_ratio > 1.5:
+        return 5
+
+    elif volume_ratio > 1:
+        return 3
+
+    else:
+        return 1
 
 def calculate_technical_score(price_history):
 
@@ -58,12 +82,13 @@ def calculate_technical_score(price_history):
     else:
         ma_score = 3
 
-
     score += ma_score
 
     details["Moving Average"] = ma_score
 
-
+    # =====================
+    # RSI
+    # =====================
     rsi = calculate_rsi(price_history)
 
     latest_rsi = rsi.iloc[-1]
@@ -74,17 +99,26 @@ def calculate_technical_score(price_history):
 
     details["RSI"] = rsi_score
 
+    # =====================
+    # Volume Ratio
+    # =====================
+    volume_ratio = calculate_volume_ratio(price_history)
+
+    volume_ratio_score = calculate_volume_ratio_score(volume_ratio)
+
+    score += volume_ratio_score
+
+    details["Volume Ratio"] = volume_ratio_score
+
+    # =====================
+    # Technical Score
+    # =====================
+
     return {
-        "technical_score": score,
-        "details": details
-    }
+    "technical_score": score,
+    "details": details,
+}
 
-
-
-if __name__ == "__main__":
-
-    print("Technical Analysis Module")
-    print(calculate_technical_score(price_history))
-
+    
 
 
