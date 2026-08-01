@@ -1,170 +1,230 @@
-# AI Closing Bell Investment Agent
+Agentic Investing
 
-## Project Goal
+An AI-powered investment analysis agent that evaluates stock holdings using fundamental analysis, technical indicators, market data, and LLM-based reasoning.
 
-Build an AI-powered end-of-day trading agent that analyzes stocks near the market close (e.g., 3:45 PM ET), evaluates company fundamentals, technical indicators, news sentiment, and overall market conditions, then generates a trading score and recommends whether to **Buy**, **Hold**, or **Sell**.
+The goal of this project is to build an intelligent investment assistant that analyzes portfolio positions near market close and provides explainable investment insights.
 
-For existing positions, the agent also evaluates whether exit conditions have been met. If the user approves, the agent prepares a Robinhood order for review through the Robinhood MCP.
+⸻
 
-Unlike a simple rule-based trading bot, this project focuses on AI reasoning, explainability, and decision support.
+Project Overview
 
----
+The AI Closing Bell Investment Agent follows this workflow:
 
-# Current Progress
-
-## ✅ Completed
-
-### Data Module
-
-- Retrieve stock fundamental data using Yahoo Finance
-- Retrieve historical price data (6 months)
-- Support multiple stocks through a customizable watchlist
-
-### Fundamental Analysis
-
-Implemented a rule-based scoring system using:
-
-- Return on Equity (ROE)
-- Profit Margin
-- Price-to-Earnings (P/E) Ratio
-- Earnings Per Share (EPS)
-
-Current Score: **35 points**
-
----
-
-### Technical Analysis
-
-Implemented:
-
-- ✅ 20-Day Moving Average (MA20)
-
-Planned:
-
-- RSI
-- Trading Volume
-- Price Momentum
-
-Current Score: **7 / 25 points implemented**
-
----
-
-# Workflow
-
-```text
-Watchlist
-      │
-      ▼
-Retrieve Stock Data
-      │
-      ▼
-Retrieve Price History
-      │
-      ▼
+Market Close
+      |
+      ↓
+Retrieve Portfolio Data
+      |
+      ↓
+Collect Market Data
+      |
+      ↓
 Fundamental Analysis
-      │
-      ▼
+      |
+      ↓
 Technical Analysis
-      │
-      ▼
-News Sentiment (Planned)
-      │
-      ▼
-Market Environment (Planned)
-      │
-      ▼
-Generate Trading Score
-      │
-      ▼
-LLM Investment Reasoning
-      │
-      ▼
-Buy / Hold / Sell Recommendation
-      │
-      ▼
-(Optional)
-Prepare Robinhood Order
-```
+      |
+      ↓
+Investment Score Generation
+      |
+      ↓
+AI Explanation & Recommendation
 
----
+The system evaluates stocks based on multiple dimensions:
 
-# Project Structure
+* Fundamental strength
+* Technical momentum
+* Trading activity
+* Market conditions
+* Portfolio fit
 
-```text
+⸻
+
+Features
+
+1. Fundamental Analysis
+
+The fundamental analysis module evaluates company financial health using:
+
+Metric	Description
+ROE	Return on Equity
+Profit Margin	Company profitability
+PE Ratio	Valuation measurement
+EPS	Earnings performance
+
+Example output:
+
+{
+    "fundamental_score": 26,
+    "details": {
+        "ROE": 7,
+        "Profit Margin": 8,
+        "PE Ratio": 4,
+        "EPS": 7
+    }
+}
+
+⸻
+
+2. Technical Analysis
+
+The technical analysis module currently includes:
+
+Moving Average
+
+Compares current price with the 20-day moving average.
+
+Purpose:
+
+* Identify short-term price trends
+* Determine whether price momentum is positive or negative
+
+RSI (Relative Strength Index)
+
+Measures recent price momentum.
+
+The RSI score evaluates whether a stock is:
+
+* Oversold
+* Neutral
+* Overbought
+
+Volume Ratio
+
+Measures current trading volume compared with the average volume.
+
+Formula:
+
+Volume Ratio = Current Volume / Average Volume(20 days)
+
+Higher volume may indicate stronger market interest.
+
+⸻
+
+Example output:
+
+{
+    "technical_score": 16,
+    "details": {
+        "Moving Average": 7,
+        "RSI": 8,
+        "Volume Score": 1
+    }
+}
+
+⸻
+
+Investment Score Framework
+
+The final investment score combines multiple categories:
+
+Category	Weight
+Fundamental Analysis	30
+Technical Analysis	20
+News Sentiment	20
+Market Environment	10
+Portfolio Fit	20
+Total	100
+
+⸻
+
+Project Structure
+
 agentic_investing/
-
-src/
 │
-├── main.py
+├── src/
+│   ├── main.py
+│   │
+│   ├── data/
+│   │   ├── market_data.py
+│   │   ├── news_data.py
+│   │   └── portfolio_data.py
+│   │
+│   ├── analysis/
+│   │   ├── fundamental_analysis.py
+│   │   └── technical_analysis.py
 │
-├── data/
-│   ├── market_data.py
-│   ├── watchlist.py
-│   ├── news_data.py
-│   └── portfolio_data.py
-│
-└── analysis/
-    ├── fundamental_analysis.py
-    └── technical_analysis.py
-```
+├── README.md
+├── requirements.txt
+└── .gitignore
 
----
+⸻
 
-# Scoring System
+Installation
 
-## Fundamental Analysis (35 pts)
+Clone the repository:
 
-| Metric | Points |
-|--------|-------:|
-| ROE | 7 |
-| Profit Margin | 8 |
-| P/E Ratio | 10 |
-| EPS | 10 |
+git clone https://github.com/katiezhu06/agentic_investing.git
 
----
+Create virtual environment:
 
-## Technical Analysis (25 pts)
+python -m venv .venv
 
-| Metric | Points | Status |
-|--------|-------:|--------|
-| Moving Average | 7 | ✅ Completed |
-| RSI | 8 | 🚧 Planned |
-| Volume | 5 | 🚧 Planned |
-| Momentum | 5 | 🚧 Planned |
+Activate environment:
 
----
+Mac/Linux:
 
-## News Sentiment (20 pts)
+source .venv/bin/activate
 
-Planned features:
+Install dependencies:
 
-- News collection
-- LLM sentiment analysis
-- Business impact evaluation
-- Confidence score
+pip install -r requirements.txt
 
----
+⸻
 
-## Market Environment (15 pts)
+Running the Project
 
-Planned features:
+Run:
 
-- S&P 500 daily performance
-- QQQ daily performance
+python src/main.py
 
----
+Example:
 
-# Technologies
+Checking: AAPL
+Fundamental:
+{
+    "fundamental_score": 26
+}
+Technical:
+{
+    "technical_score": 16
+}
 
-- Python
-- pandas
-- yfinance
-- Git
-- GitHub
+⸻
 
-Future:
+Development Roadmap
 
-- OpenAI API
-- Robinhood MCP
-- News API
-- LangGraph
+Completed
+
+* Connect market data API
+* Fundamental analysis module
+* Moving Average indicator
+* RSI indicator
+* Volume Ratio indicator
+* Technical scoring system
+
+In Progress
+
+* Momentum indicators
+* News sentiment analysis
+* Market environment analysis
+* Portfolio risk analysis
+* LLM investment explanation module
+
+⸻
+
+Technologies
+
+* Python
+* Pandas
+* NumPy
+* yfinance
+* Git/GitHub
+* Model Context Protocol (MCP)
+* Large Language Models (LLMs)
+
+⸻
+
+Author
+
+Katie Zhu
