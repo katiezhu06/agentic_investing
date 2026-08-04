@@ -1,4 +1,5 @@
-from data.market_data import get_market_history
+from src.data.market_data import get_price_history
+
 
 
 def calculate_market_score():
@@ -11,8 +12,7 @@ def calculate_market_score():
     # =====================
     # S&P500
     # =====================
-
-    sp500 = get_market_history("^GSPC")
+    sp500 = get_price_history("^GSPC")
 
     sp500_close = sp500["Close"]
 
@@ -25,24 +25,26 @@ def calculate_market_score():
 
     if sp500_current > sp500_ma20:
         sp500_score = 5
+        sp500_trend = "bullish"
     else:
         sp500_score = 2
+        sp500_trend = "bearish"
 
 
     score += sp500_score
 
     details["S&P500"] = {
         "score": sp500_score,
-        "ratio": sp500_ratio
-    }
-
+        "price_to_ma20_ratio": float(sp500_ratio),
+    "trend": sp500_trend
+}
 
 
     # =====================
     # QQQ
     # =====================
 
-    qqq = get_market_history("QQQ")
+    qqq = get_price_history("QQQ")
 
     qqq_close = qqq["Close"]
 
@@ -55,16 +57,19 @@ def calculate_market_score():
 
     if qqq_current > qqq_ma20:
         qqq_score = 5
+        qqq_trend = "bullish"
     else:
         qqq_score = 2
+        qqq_trend = "bearish"
 
 
     score += qqq_score
 
     details["QQQ"] = {
         "score": qqq_score,
-        "ratio": qqq_ratio
-    }
+        "price_to_ma20_ratio": float(qqq_ratio),
+        "trend": qqq_trend
+}
 
 
     return {
