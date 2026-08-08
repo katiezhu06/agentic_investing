@@ -119,6 +119,22 @@ def calculate_technical_score(price_history):
     "details": details,
 }
 
-    
+
+
+# =====================
+
+# Test
+
+# =====================
+
+if __name__ == "__main__":
+
+    from src.data.market_data import get_price_history
+
+    history = get_price_history("AAPL")
+
+    result = calculate_technical_score(history)
+
+    print(result)
 
 
