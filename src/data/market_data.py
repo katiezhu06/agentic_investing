@@ -26,6 +26,7 @@ def get_stock_info(symbol):
     "profit_margins": info.get("profitMargins"),
 
     }
+    
 def get_price_history(symbol):
 
     stock = yf.Ticker(symbol)
@@ -35,8 +36,9 @@ def get_price_history(symbol):
     if history.empty:
         return None
 
-    return history
+    history = history.dropna(subset=["Close"])
 
+    return history
 
 
 
