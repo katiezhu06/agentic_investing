@@ -13,10 +13,10 @@ def calculate_fundamental_score(stock_data):
     if roe is not None:
 
         if roe > 0.25:
-            roe_score = 7
+            roe_score = 8
 
         elif roe > 0.15:
-            roe_score = 5
+            roe_score = 6
 
         elif roe > 0.10:
             roe_score = 3
@@ -72,16 +72,16 @@ def calculate_fundamental_score(stock_data):
     if pe is not None:
 
         if 10 <= pe <= 25:
-            pe_score = 10
-
-        elif 25 < pe <= 35:
             pe_score = 7
 
+        elif 25 < pe <= 35:
+            pe_score = 5
+
         elif 35 < pe <= 50:
-            pe_score = 4
+            pe_score = 3
 
         else:
-            pe_score = 2
+            pe_score = 1
 
     else:
         pe_score = 0
@@ -102,16 +102,16 @@ def calculate_fundamental_score(stock_data):
     if eps is not None:
 
         if eps > 10:
-            eps_score = 10
+            eps_score = 7
 
         elif eps > 5:
             eps_score = 7
 
         elif eps > 0:
-            eps_score = 4
+            eps_score = 5
 
         else:
-            eps_score = 0
+            eps_score = 3
 
     else:
         eps_score = 0
