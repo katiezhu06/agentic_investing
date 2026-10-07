@@ -161,7 +161,7 @@ Files:
 - `src/data/news_data.py` — fetch and filter Finnhub company news
 - `src/analysis/news_analysis.py` — score articles and aggregate a news score
 
-This is a **keyword-based baseline**. It does **not** call an LLM for sentiment.
+Sentiment is analyzed with [ProsusAI/finbert](https://huggingface.co/ProsusAI/finbert) through Hugging Face Transformers. Risk and importance remain transparent rule-based scores.
 
 ### Pipeline
 
@@ -195,11 +195,11 @@ Related news is kept on purpose. A story about Microsoft, Google, Amazon, Samsun
 
 | Component | Range | Role |
 | --- | --- | --- |
-| Sentiment | 0–10 | Positive language raises the score; negative language lowers it. Neutral starts at 5. |
+| Sentiment | 0–10 | FinBERT's positive and negative probabilities are converted with `5 + 5 × (positive − negative)`, then clamped and rounded. Neutral is 5. |
 | Risk | 0–5 | Legal, regulatory, operational, or similar risk language. |
 | Importance | 0–5 | Larger events (earnings, deals, product launches) score higher than minor mentions. |
 
-Scoring uses keyword lists on the headline and summary.
+FinBERT evaluates each article's headline and summary together. The model is loaded once per process and reused across articles. If it is unavailable, the article uses the neutral baseline (5) so the overall score can still be returned. Risk and importance continue to use the documented keyword rules.
 
 ### Aggregation
 
@@ -302,6 +302,7 @@ Used in the current codebase:
 - requests
 - python-dotenv
 - Finnhub API (company news)
+- Hugging Face Transformers + PyTorch (FinBERT news sentiment)
 - Robinhood MCP config (`.cursor/mcp.json`) for a later brokerage connection
 
 Not used in the scoring code yet: LLM APIs, live Robinhood portfolio/order tools.
@@ -327,7 +328,7 @@ source .venv/bin/activate   # Mac/Linux
 3. Install packages:
 
 ```bash
-pip install yfinance pandas requests python-dotenv
+pip install -r requirements.txt
 ```
 
 4. Add a Finnhub API key in a local `.env` file (this file is gitignored):
@@ -368,12 +369,12 @@ News scoring needs that key. Market/fundamental/technical scoring uses yfinance 
 
 ## Limitations / Future Improvements
 
-- Keyword-based news analysis is a baseline. It can miss sarcasm, context, or mixed articles, and it can over-count generic words.
+- FinBERT is specialized for financial sentiment, but it can still miss context, sarcasm, or mixed articles. Risk and importance remain heuristic keyword rules.
 - Market and news data depend on external APIs (yfinance, Finnhub). Missing data or API errors reduce coverage; empty news returns a news score of 0.
 - Scoring rules are heuristics, not a statistically validated investment model. They are for coursework and prototyping, not production research.
 - The market environment score is shared across all tickers; it does not measure a stock’s beta or sector relative strength.
 - This project provides **decision support**, not financial advice, and it is not a licensed or autonomous trading system.
-- Future work: LLM-based news analysis, portfolio-aware scoring, clearer Buy/Hold/Sell thresholds, and an explanation layer that cites the component scores.
+- Future work: portfolio-aware scoring, clearer Buy/Hold/Sell thresholds, and an explanation layer that cites the component scores.
 
 ---
 

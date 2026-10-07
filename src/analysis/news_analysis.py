@@ -1,85 +1,10 @@
+from functools import lru_cache
+
 from src.data.news_data import get_company_news, get_relevance_type
 
 
-# Words that usually mean the news is good for the stock.
-POSITIVE_WORDS = [
-    "beat",
-    "beats",
-    "beating",
-    "growth",
-    "record",
-    "profit",
-    "profitable",
-    "upgrade",
-    "upgraded",
-    "outperform",
-    "surge",
-    "rally",
-    "gain",
-    "gains",
-    "soar",
-    "soars",
-    "jump",
-    "jumps",
-    "partnership",
-    "deal",
-    "launch",
-    "launches",
-    "innovation",
-    "strong",
-    "bullish",
-    "expansion",
-    "dividend",
-    "buyback",
-    "approval",
-    "approved",
-    "win",
-    "wins",
-    "contract",
-    "optimistic",
-    "all-time high",
-    "revenue growth",
-]
-
-
-# Words that usually mean the news is bad for the stock.
-NEGATIVE_WORDS = [
-    "miss",
-    "misses",
-    "missed",
-    "decline",
-    "drop",
-    "drops",
-    "fall",
-    "falls",
-    "loss",
-    "losses",
-    "lawsuit",
-    "layoff",
-    "layoffs",
-    "downgrade",
-    "downgraded",
-    "weak",
-    "bearish",
-    "warning",
-    "cut",
-    "cuts",
-    "delay",
-    "delayed",
-    "recall",
-    "scandal",
-    "fraud",
-    "investigation",
-    "fine",
-    "penalty",
-    "crash",
-    "plunge",
-    "slump",
-    "underperform",
-    "bankruptcy",
-    "disappointing",
-    "slowdown",
-]
+FINBERT_MODEL = "ProsusAI/finbert"
+_finbert_error_reported = False
 
 
 # Words that point to legal, regulatory, or operational risk.
@@ -206,6 +131,49 @@ def clamp(value, minimum, maximum):
     return max(minimum, min(maximum, value))
 
 
+@lru_cache(maxsize=1)
+def get_finbert_classifier():
+    """Load FinBERT once and reuse it for all article classifications."""
+
+    from transformers import pipeline
+
+    return pipeline(
+        "text-classification",
+        model=FINBERT_MODEL,
+        top_k=None,
+    )
+
+
+def get_finbert_sentiment(text):
+    """Return a FinBERT-based sentiment score from 0 to 10.
+
+    If FinBERT cannot be loaded or classify an article, return the neutral
+    baseline so one failed article does not prevent the investment score from
+    being calculated.
+    """
+
+    global _finbert_error_reported
+
+    if not text.strip():
+        return 5
+
+    try:
+        result = get_finbert_classifier()(text, truncation=True, max_length=512)
+        scores = {
+            item["label"].lower(): item["score"]
+            for item in result[0]
+        }
+        positive_probability = scores["positive"]
+        negative_probability = scores["negative"]
+        sentiment = 5 + 5 * (positive_probability - negative_probability)
+        return int(round(clamp(sentiment, 0, 10)))
+    except Exception as error:
+        if not _finbert_error_reported:
+            print(f"Warning: FinBERT sentiment unavailable ({error}). Using neutral sentiment.")
+            _finbert_error_reported = True
+        return 5
+
+
 def classify_relevance(article, symbol):
     """
     Decide if the article is directly about the target company
@@ -259,15 +227,11 @@ def score_article(article, symbol):
 
     # -------------------------
     # Sentiment (0-10)
-    # Start at 5 (neutral), then move up or down.
+    # FinBERT returns positive, neutral, and negative probabilities.
+    # Convert the directional probabilities into this project's 0-10 scale.
     # -------------------------
 
-    positive_hits = count_keyword_hits(text, POSITIVE_WORDS)
-    negative_hits = count_keyword_hits(text, NEGATIVE_WORDS)
-
-    sentiment_shift = min(positive_hits, 5) - min(negative_hits, 5)
-    sentiment = 5 + (sentiment_shift * impact_weight)
-    sentiment = int(round(clamp(sentiment, 0, 10)))
+    sentiment = get_finbert_sentiment(text)
 
 
     # -------------------------
