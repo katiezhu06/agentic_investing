@@ -1,0 +1,6 @@
+yfinance
+pandas
+requests
+python-dotenv
+transformers
+torch
