@@ -2,6 +2,7 @@ from src.analysis.fundamental_analysis import calculate_fundamental_score
 from src.data.market_data import get_stock_info
 from src.analysis.technical_analysis import calculate_technical_score
 from src.analysis.market_analysis import calculate_market_score
+from src.analysis.news_analysis import calculate_news_score
 
 from src.data.market_data import get_price_history
 
@@ -18,6 +19,8 @@ def calculate_investment_score(symbol):
 
     market = calculate_market_score()
 
+    news = calculate_news_score(symbol)
+
 
     total_score = (
         fundamental["fundamental_score"]
@@ -25,6 +28,8 @@ def calculate_investment_score(symbol):
         technical["technical_score"]
         +
         market["market_score"]
+        +
+        news["news_score"]
     )
 
 
@@ -33,6 +38,7 @@ def calculate_investment_score(symbol):
         "fundamental": fundamental,
         "technical": technical,
         "market": market,
+        "news": news,
         "total_score": total_score
     }
 
