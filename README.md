@@ -285,7 +285,7 @@ agentic_investing/
 ├── .gitignore
 ├── README.md
 ├── config.py                   # placeholder
-└── requirments.txt
+└── requirements.txt
 ```
 
 Empty folders such as `src/ai`, `src/portfolio`, `src/utils`, and `tests` exist as placeholders and do not contain code yet.
